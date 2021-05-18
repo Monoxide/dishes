@@ -13,7 +13,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace OottTray
+namespace Monoxide.Dishes
 {
     public partial class MainForm : Form
     {
@@ -45,7 +45,7 @@ namespace OottTray
             if (!Directory.Exists(dir)) { Directory.CreateDirectory(dir); }
 
             menu.Items.Clear();
-            var sub = new ToolStripMenuItem("&OottTray");
+            var sub = new ToolStripMenuItem("&Dishes");
             sub.RightToLeft = RightToLeft.Yes;
             menu.Items.Add(sub);
             sub.DropDown.RightToLeft = RightToLeft.No;

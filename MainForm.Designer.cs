@@ -1,5 +1,5 @@
 ﻿
-namespace OottTray
+namespace Monoxide.Dishes
 {
     partial class MainForm
     {
@@ -36,9 +36,9 @@ namespace OottTray
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Name = "Form1";
+            this.Name = "Dishes";
             this.ShowInTaskbar = false;
-            this.Text = "OottTray";
+            this.Text = "Dishes";
             this.ResumeLayout(false);
 
         }
