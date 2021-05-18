@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Monoxide Apps")]
 [assembly: AssemblyProduct("Dishes")]
-[assembly: AssemblyCopyright("Copyright © Monoxide Apps 2021")]
+[assembly: AssemblyCopyright("Copyright © 2021 Monoxide Apps")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -12,6 +12,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using KPreisser.UI;
 
 namespace Monoxide.Dishes
 {
@@ -22,10 +23,13 @@ namespace Monoxide.Dishes
         string exePath;
         string title;
         string dir;
+        string version;
 
         public MainForm()
         {
-            exePath = Assembly.GetEntryAssembly().Location;
+            var assembly = Assembly.GetEntryAssembly();
+            version = assembly.GetName().Version.ToString();
+            exePath = assembly.Location;
             title = Path.GetFileNameWithoutExtension(exePath);
             dir = Path.Combine(Path.GetDirectoryName(exePath), title);
 
@@ -38,6 +42,55 @@ namespace Monoxide.Dishes
             ni.ContextMenuStrip = menu;
             ni.Visible = true;
             RebuildMenu();
+        }
+
+        TaskDialog aboutDialog;
+
+        void ShowAboutBox()
+        {
+            if (this.aboutDialog != null) return;
+            TaskDialogPage page = new TaskDialogPage()
+            {
+                Title = "About",
+                Instruction = "Dishes " + this.version,
+                Text = "By <A HREF=\"https://redirect.orztech.com/dishes/author\">Monoxide Apps</A>\n" +
+                    "\n" +
+                    "<A HREF=\"https://redirect.orztech.com/dishes\">Web page</A>\n" +
+                    "<A HREF=\"https://redirect.orztech.com/dishes/bugtracker\">Bug tracker</A>\n" +
+                    "<A HREF=\"https://redirect.orztech.com/dishes/donate\">Donate</A>\n" +
+                    "",
+                Expander = new TaskDialogExpander()
+                {
+                     ExpandedButtonText = "Hide &License",
+                     CollapsedButtonText = "Show &License",
+                     ExpandFooterArea = true,
+                     Text = "Copyright (C) 2021 Monoxide Apps\n" +
+                        "\n" +
+                        "This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\n\n" +
+                        "This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\n" +
+                        "You should have received a copy of the GNU General Public License along with this program.  If not, see <A HREF=\"https://www.gnu.org/licenses/\">https://www.gnu.org/licenses/</A>.\n" +
+                        "\n" +
+                        "<A HREF=\"https://redirect.orztech.com/dishes/thirdpartynotices\">Third Party Notices</A>"
+                },
+                SizeToContent = true,
+                EnableHyperlinks = true
+            };
+            page.HyperlinkClicked += (s, e) =>
+            {
+                Process.Start(new ProcessStartInfo()
+                {
+                    FileName = e.Hyperlink + "?av=" + System.Uri.EscapeDataString(version),
+                    UseShellExecute = true
+                });
+            };
+            try
+            {
+                this.aboutDialog = new TaskDialog(page);
+                this.aboutDialog.Show();
+            } finally
+            {
+                this.aboutDialog = null;
+            }
         }
 
         void RebuildMenu()
@@ -57,6 +110,8 @@ namespace Monoxide.Dishes
                 Arguments = dir,
                 UseShellExecute = true
             }));
+            sub.DropDownItems.Add("-");
+            sub.DropDownItems.Add("&About...", null, (s, e) => ShowAboutBox());
             sub.DropDownItems.Add("-");
             sub.DropDownItems.Add("&Exit", null, (s, e) => Application.Exit());
             menu.Items.Add("-");

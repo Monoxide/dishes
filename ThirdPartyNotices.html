@@ -1,0 +1,191 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<title>Dishes Third Party Notices</title>
+<style>
+html {
+  direction: ltr;
+}
+body {
+  font-family: system-ui, sans-serif;
+  font-size: 75%;
+}
+button {
+  font-family: system-ui, sans-serif;
+}
+body {
+  background-color: white;
+  font-size: 84%;
+  max-width: 1020px;
+}
+.page-title {
+  font-size: 164%;
+  font-weight: bold;
+}
+.product {
+  background-color: #c3d9ff;
+  border-radius: 5px;
+  margin-top: 16px;
+  overflow: auto;
+  padding: 2px;
+}
+.product .title {
+  float: left;
+  font-size: 110%;
+  font-weight: bold;
+  margin: 3px;
+}
+.product .homepage {
+  color: blue;
+  float: right;
+  margin: 3px;
+  text-align: right;
+}
+.product .homepage::before {
+  content: " - ";
+}
+.product .show {
+  color: blue;
+  float: right;
+  margin: 3px;
+  text-align: right;
+  text-decoration: underline;
+}
+.licence {
+  background-color: #e8eef7;
+  border-radius: 3px;
+  clear: both;
+  display: none;
+  padding: 16px;
+}
+.licence h3 {
+  margin-top: 0;
+}
+.licence pre {
+  white-space: pre-wrap;
+}
+.dialog #print-link,
+.dialog .homepage {
+  display: none;
+}
+input + label + div {
+  display: none;
+}
+input + label::after {
+  content: "show license";
+  cursor: pointer;
+}
+input:checked + label + div {
+  display: block;
+}
+input:checked + label::after {
+  content: "hide license";
+  cursor: pointer;
+}
+@media print {
+  .licence {
+    display: block !important;
+  }
+}
+</style>
+</head>
+<body>
+<span class="page-title" style="float:left;">Dishes Third Party Notices</span>
+<a id="print-link" href="#" style="float:right;">Print</a>
+<div style="clear:both; overflow:auto;"><!-- Dishes <3s the following projects -->
+<div class="product">
+<span class="title">Chromium: licenses.py, about_credits.tmpl, about_credits_entry.tmpl, about_credits.js</span>
+<span class="homepage"><a href="https://www.chromium.org/">homepage</a></span>
+<input type="checkbox" hidden id="1">
+<label class="show" for="1" tabindex="0"></label>
+<div class="licence">
+<pre>// https://cs.chromium.org/chromium/src/LICENSE?rcl=92d07a3931ffebea0ce216b9b0f28277de8ce977
+// https://cs.chromium.org/chromium/src/components/about_ui/resources/about_credits.tmpl?rcl=92d07a3931ffebea0ce216b9b0f28277de8ce977
+// https://cs.chromium.org/chromium/src/components/about_ui/resources/about_credits_entry.tmpl?rcl=92d07a3931ffebea0ce216b9b0f28277de8ce977
+// https://cs.chromium.org/chromium/src/components/about_ui/resources/about_credits.js?rcl=92d07a3931ffebea0ce216b9b0f28277de8ce977
+// https://cs.chromium.org/chromium/src/tools/licenses.py?rcl=92d07a3931ffebea0ce216b9b0f28277de8ce977
+//
+// Copyright 2015 The Chromium Authors. All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are
+// met:
+//
+//    * Redistributions of source code must retain the above copyright
+// notice, this list of conditions and the following disclaimer.
+//    * Redistributions in binary form must reproduce the above
+// copyright notice, this list of conditions and the following disclaimer
+// in the documentation and/or other materials provided with the
+// distribution.
+//    * Neither the name of Google Inc. nor the names of its
+// contributors may be used to endorse or promote products derived from
+// this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+// OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+</pre>
+</div>
+</div>
+<div class="product">
+<span class="title">Task Dialog for .NET (Windows)</span>
+<span class="homepage"><a href="https://github.com/kpreisser/TaskDialog/tree/a952b5f27d3026c42628be394c19487a59307329">homepage</a></span>
+<input type="checkbox" hidden id="2">
+<label class="show" for="2" tabindex="0"></label>
+<div class="licence">
+<pre>Copyright (c) 2018 Konstantin Preißer, www.preisser-it.de
+
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+</pre>
+</div>
+</div>
+
+</div>
+<script>
+function $(id) { return document.getElementById(id); }
+
+document.addEventListener('DOMContentLoaded', function() {
+  $('print-link').hidden = false;
+  $('print-link').onclick = function() {
+    window.print();
+    return false;
+  };
+
+  document.addEventListener('keypress', function(e) {
+    // Make the license show/hide toggle when the Enter is pressed.
+    if (e.keyCode == 0x0d && e.target.tagName == 'LABEL')
+      e.target.previousElementSibling.click();
+  });
+});
+</script>
+</body>
+</html>
