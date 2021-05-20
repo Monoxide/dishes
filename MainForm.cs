@@ -40,21 +40,70 @@ namespace Monoxide.Dishes
                 ni.Icon = Icon.ExtractAssociatedIcon(exePath);
             } catch { }
             ni.Text = title;
-            ni.ContextMenuStrip = menu;
             ni.Visible = true;
             RebuildMenu();
 
             menu.Renderer = new DirectionAwareToolStripProfessionalRenderer();
             ni.MouseMove += Ni_MouseMove;
+            SetupMenuEvent();
         }
 
-        Throttler mouseMoveThrottler = new Throttler();
         private void Ni_MouseMove(object sender, MouseEventArgs e)
         {
-            if (mouseMoveThrottler.Throttle(TimeSpan.FromSeconds(5)))
+            CheckTaskbarPositionThrottle();
+        }
+
+        void SetupMenuEvent()
+        {
+            var windowField = ni.GetType().GetField("window", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(ni);
+            if (windowField != null && windowField is NativeWindow notifyIconWindow)
             {
-                RefreshDirection();
+                var workingAreaConstrainedProperty = typeof(ToolStripDropDown).GetProperty("WorkingAreaConstrained", BindingFlags.Instance | BindingFlags.NonPublic);
+
+                ni.MouseUp += (sender, e) =>
+                {
+                    if (e.Button == MouseButtons.Right)
+                    {
+                        CheckTaskbarPosition();
+                        GetCursorPos(out var point);
+                        SetForegroundWindow(notifyIconWindow.Handle);
+
+                        if (menu is ToolStripDropDown)
+                        {
+                            workingAreaConstrainedProperty?.SetValue(menu, false);
+                        }
+
+                        var direction = ToolStripDropDownDirection.AboveLeft;
+                        switch(taskbarPosition)
+                        {
+                            case TaskbarPosition.Bottom: direction = ToolStripDropDownDirection.AboveLeft; break;
+                            case TaskbarPosition.Left: direction = ToolStripDropDownDirection.AboveRight; break;
+                            case TaskbarPosition.Top: direction = ToolStripDropDownDirection.BelowLeft; break;
+                            case TaskbarPosition.Right: direction = ToolStripDropDownDirection.AboveLeft; break;
+                        }
+                        menu.Show(new Point(point.X, point.Y), direction);
+                    }
+                };
             }
+            else
+            {
+                ni.ContextMenuStrip = menu;
+            }
+        }
+
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool GetCursorPos(out POINT lpPoint);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct POINT
+        {
+            public int X;
+            public int Y;
         }
 
         class DirectionAwareToolStripProfessionalRenderer : ToolStripProfessionalRenderer
@@ -121,9 +170,29 @@ namespace Monoxide.Dishes
             }
         }
 
+        TaskbarPosition taskbarPosition = TaskbarPosition.Unknown;
+        void CheckTaskbarPosition()
+        {
+            var position = Taskbar.Position;
+            if (taskbarPosition != position)
+            {
+                taskbarPosition = position;
+                RefreshDirection();
+            }
+        }
+
+        Throttler positionThrottler = new Throttler();
+        void CheckTaskbarPositionThrottle()
+        {
+            if (positionThrottler.Throttle(TimeSpan.FromSeconds(5)))
+            {
+                CheckTaskbarPosition();
+            }
+        }
+
         void RefreshDirection()
         {
-            var direction = Taskbar.Position == TaskbarPosition.Left ? ToolStripDropDownDirection.Default : ToolStripDropDownDirection.Left;
+            var direction = taskbarPosition == TaskbarPosition.Left ? ToolStripDropDownDirection.Default : ToolStripDropDownDirection.Left;
             foreach(var ddi in dropDownItems)
             {
                 ddi.DropDownDirection = direction;
@@ -136,7 +205,7 @@ namespace Monoxide.Dishes
 
             menu.Items.Clear();
             dropDownItems.Clear();
-            var sub = new ToolStripMenuItem("&Dishes");
+            var sub = new ToolStripMenuItem(title);
             menu.Items.Add(sub);
             dropDownItems.Add(sub);
             ((ToolStripDropDownMenu)sub.DropDown).ShowImageMargin = false;
