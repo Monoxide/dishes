@@ -59,6 +59,9 @@ namespace Monoxide.Dishes
             if (windowField != null && windowField is NativeWindow notifyIconWindow)
             {
                 var workingAreaConstrainedProperty = typeof(ToolStripDropDown).GetProperty("WorkingAreaConstrained", BindingFlags.Instance | BindingFlags.NonPublic);
+                var modalMenuFilterType = typeof(ToolStripManager).Assembly.GetType("System.Windows.Forms.ToolStripManager+ModalMenuFilter", false);
+                var modalMenuFilterInstance = modalMenuFilterType?.GetProperty("Instance", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+                var showUnderlinesProperty = modalMenuFilterType?.GetProperty("ShowUnderlines", BindingFlags.Public | BindingFlags.Instance);
 
                 ni.MouseUp += (sender, e) =>
                 {
@@ -71,6 +74,10 @@ namespace Monoxide.Dishes
                         if (menu is ToolStripDropDown)
                         {
                             workingAreaConstrainedProperty?.SetValue(menu, false);
+                        }
+
+                        if (showUnderlinesProperty != null) {
+                            showUnderlinesProperty.SetValue(modalMenuFilterInstance, true);
                         }
 
                         var direction = ToolStripDropDownDirection.AboveLeft;
@@ -218,7 +225,7 @@ namespace Monoxide.Dishes
                 UseShellExecute = true
             }));
             sub.DropDownItems.Add("-");
-            sub.DropDownItems.Add("&About...", null, (s, e) => ShowAboutBox());
+            sub.DropDownItems.Add("&About" + (title == "Dishes" ? "" : " Dishes") + "...", null, (s, e) => ShowAboutBox());
             sub.DropDownItems.Add("-");
             sub.DropDownItems.Add("&Exit", null, (s, e) => Application.Exit());
             menu.Items.Add("-");
