@@ -122,6 +122,8 @@ namespace Monoxide.Dishes
                 if (attr.HasFlag(FileAttributes.Hidden) || attr.HasFlag(FileAttributes.System)) continue;
 
                 var name = Path.GetFileNameWithoutExtension(i);
+                if (name.StartsWith(".")) continue;
+
                 var match = regex.Match(name);
                 if (match != null) {
                     name = name.Substring(match.Value.Length);
