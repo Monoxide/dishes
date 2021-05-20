@@ -20,6 +20,7 @@ namespace Monoxide.Dishes
     {
         NotifyIcon ni = new NotifyIcon();
         ContextMenuStrip menu = new ContextMenuStrip();
+        List<ToolStripDropDownItem> dropDownItems = new List<ToolStripDropDownItem>();
         string exePath;
         string title;
         string dir;
@@ -42,6 +43,33 @@ namespace Monoxide.Dishes
             ni.ContextMenuStrip = menu;
             ni.Visible = true;
             RebuildMenu();
+
+            menu.Renderer = new DirectionAwareToolStripProfessionalRenderer();
+            ni.MouseMove += Ni_MouseMove;
+        }
+
+        Throttler mouseMoveThrottler = new Throttler();
+        private void Ni_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (mouseMoveThrottler.Throttle(TimeSpan.FromSeconds(5)))
+            {
+                RefreshDirection();
+            }
+        }
+
+        class DirectionAwareToolStripProfessionalRenderer : ToolStripProfessionalRenderer
+        {
+            protected override void OnRenderArrow(ToolStripArrowRenderEventArgs e)
+            {
+                if (e.Item is ToolStripDropDownItem ddi)
+                {
+                    if (e.Direction == ArrowDirection.Right && ddi.DropDownDirection == ToolStripDropDownDirection.Left)
+                    {
+                        e.Direction = ArrowDirection.Left;
+                    }
+                }
+                base.OnRenderArrow(e);
+            }
         }
 
         TaskDialog aboutDialog;
@@ -93,16 +121,26 @@ namespace Monoxide.Dishes
             }
         }
 
+        void RefreshDirection()
+        {
+            var direction = Taskbar.Position == TaskbarPosition.Left ? ToolStripDropDownDirection.Default : ToolStripDropDownDirection.Left;
+            foreach(var ddi in dropDownItems)
+            {
+                ddi.DropDownDirection = direction;
+            }
+        }
+
         void RebuildMenu()
         {
             if (!Directory.Exists(dir)) { Directory.CreateDirectory(dir); }
 
             menu.Items.Clear();
+            dropDownItems.Clear();
             var sub = new ToolStripMenuItem("&Dishes");
-            sub.RightToLeft = RightToLeft.Yes;
             menu.Items.Add(sub);
-            sub.DropDown.RightToLeft = RightToLeft.No;
+            dropDownItems.Add(sub);
             ((ToolStripDropDownMenu)sub.DropDown).ShowImageMargin = false;
+
             sub.DropDownItems.Add("&Refresh", null, (s, e) => RebuildMenu());
             sub.DropDownItems.Add("&Explorer...", null, (s, e) => Process.Start(new ProcessStartInfo()
             {
@@ -146,6 +184,8 @@ namespace Monoxide.Dishes
                     });
                 });
             }
+
+            RefreshDirection();
         }
     }
 }
