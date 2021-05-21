@@ -19,6 +19,7 @@ namespace Monoxide.Dishes
     public partial class MainForm : Form
     {
         NotifyIcon ni = new NotifyIcon();
+        Bitmap mainIcon;
         ContextMenuStrip menu = new ContextMenuStrip();
         List<ToolStripDropDownItem> dropDownItems = new List<ToolStripDropDownItem>();
         string exePath;
@@ -39,6 +40,7 @@ namespace Monoxide.Dishes
             try {
                 ni.Icon = Icon.ExtractAssociatedIcon(exePath);
             } catch { }
+            mainIcon = ni.Icon.ToBitmap();
             ni.Text = title;
             ni.Visible = true;
             RebuildMenu();
@@ -217,6 +219,9 @@ namespace Monoxide.Dishes
             dropDownItems.Add(sub);
             ((ToolStripDropDownMenu)sub.DropDown).ShowImageMargin = false;
 
+            sub.Checked = true;
+            sub.CheckOnClick = false;
+            sub.Image = mainIcon;
             sub.DropDownItems.Add("&Refresh", null, (s, e) => RebuildMenu());
             sub.DropDownItems.Add("&Explorer...", null, (s, e) => Process.Start(new ProcessStartInfo()
             {
