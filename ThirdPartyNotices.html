@@ -3,29 +3,63 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width">
+<meta name="color-scheme" content="light dark">
 <title>Dishes Third Party Notices</title>
 <style>
-html {
-  direction: ltr;
-}
 body {
-  font-family: system-ui, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   font-size: 75%;
 }
+
 button {
-  font-family: system-ui, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
+
+html {
+  --google-blue-50: rgb(232, 240, 254);
+  --google-blue-300: rgb(138, 180, 248);
+  --google-blue-600: rgb(26, 115, 232);
+  --google-blue-900: rgb(23, 78, 166);
+  --google-grey-200: rgb(232, 234, 237);
+  --google-grey-800: rgb(60, 64, 67);
+  --google-grey-900: rgb(32, 33, 36);
+
+  --interactive-color: var(--google-blue-600);
+  --primary-color: var(--google-grey-900);
+
+  --product-background: var(--google-blue-50);
+  --product-text-color: var(--google-blue-900);
+
+  background: white;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    --interactive-color: var(--google-blue-300);
+    --primary-color: var(--google-grey-200);
+
+    --product-background: var(--google-grey-800);
+    --product-text-color: var(--google-grey-200);
+
+    background: var(--google-grey-900);
+  }
+}
+
 body {
-  background-color: white;
+  color: var(--primary-color);
   font-size: 84%;
   max-width: 1020px;
+}
+a {
+  color: var(--interactive-color);
 }
 .page-title {
   font-size: 164%;
   font-weight: bold;
 }
 .product {
-  background-color: #c3d9ff;
+  background-color: var(--product-background);
+  color: var(--product-text-color);
   border-radius: 5px;
   margin-top: 16px;
   overflow: auto;
@@ -38,7 +72,7 @@ body {
   margin: 3px;
 }
 .product .homepage {
-  color: blue;
+  color: var(--interactive-color);
   float: right;
   margin: 3px;
   text-align: right;
@@ -47,14 +81,13 @@ body {
   content: " - ";
 }
 .product .show {
-  color: blue;
+  color: var(--interactive-color);
   float: right;
   margin: 3px;
   text-align: right;
   text-decoration: underline;
 }
 .licence {
-  background-color: #e8eef7;
   border-radius: 3px;
   clear: both;
   display: none;
@@ -101,11 +134,10 @@ input:checked + label::after {
 <input type="checkbox" hidden id="1">
 <label class="show" for="1" tabindex="0"></label>
 <div class="licence">
-<pre>// https://cs.chromium.org/chromium/src/LICENSE?rcl=92d07a3931ffebea0ce216b9b0f28277de8ce977
-// https://cs.chromium.org/chromium/src/components/about_ui/resources/about_credits.tmpl?rcl=92d07a3931ffebea0ce216b9b0f28277de8ce977
-// https://cs.chromium.org/chromium/src/components/about_ui/resources/about_credits_entry.tmpl?rcl=92d07a3931ffebea0ce216b9b0f28277de8ce977
-// https://cs.chromium.org/chromium/src/components/about_ui/resources/about_credits.js?rcl=92d07a3931ffebea0ce216b9b0f28277de8ce977
-// https://cs.chromium.org/chromium/src/tools/licenses.py?rcl=92d07a3931ffebea0ce216b9b0f28277de8ce977
+<pre>// https://source.chromium.org/chromium/chromium/src/+/master:LICENSE;drc=0125cf675617075bb4216dc1a794b9038be4f63d
+// https://source.chromium.org/chromium/chromium/src/+/master:components/about_ui/resources/about_credits.tmpl;drc=e98ee9e02ae092d7591cd853c6dcbd2ed9ec02a6
+// https://source.chromium.org/chromium/chromium/src/+/master:components/about_ui/resources/about_credits_entry.tmpl;drc=e98ee9e02ae092d7591cd853c6dcbd2ed9ec02a6
+// https://source.chromium.org/chromium/chromium/src/+/master:components/about_ui/resources/about_credits.js;drc=e98ee9e02ae092d7591cd853c6dcbd2ed9ec02a6
 //
 // Copyright 2015 The Chromium Authors. All rights reserved.
 //
@@ -124,7 +156,7 @@ input:checked + label::after {
 // this software without specific prior written permission.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-// &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 // LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
 // A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
 // OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
@@ -134,7 +166,6 @@ input:checked + label::after {
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 </pre>
 </div>
 </div>
