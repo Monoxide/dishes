@@ -1,0 +1,3 @@
+https://einaregilsson.com/add-multiple-icons-to-a-dotnet-application/
+https://github.com/einaregilsson/InsertIcons
+https://github.com/einaregilsson/InsertIcons/releases/download/1.2/InsertIcons.exe
