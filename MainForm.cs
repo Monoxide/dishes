@@ -19,13 +19,45 @@ namespace Monoxide.Dishes
     public partial class MainForm : Form
     {
         NotifyIcon ni = new NotifyIcon();
-        Bitmap mainIcon;
         ContextMenuStrip menu = new ContextMenuStrip();
         List<ToolStripDropDownItem> dropDownItems = new List<ToolStripDropDownItem>();
         string exePath;
         string title;
         string dir;
         string version;
+
+        Icon appIcon;
+        Icon trayIconDark;
+        Icon trayIconLight;
+
+        Bitmap appMenuBitmap;
+
+        [DllImport("shell32.dll")]
+        internal static extern IntPtr ExtractIcon(IntPtr hInst, string file, int nIconIndex);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        internal static extern bool DestroyIcon(IntPtr hIcon);
+
+        Icon LoadIcon(int index)
+        {
+            IntPtr hIcon = ExtractIcon(IntPtr.Zero, exePath, index);
+            if (hIcon == IntPtr.Zero) return null;
+
+            Icon icon = (Icon)Icon.FromHandle(hIcon).Clone();
+            DestroyIcon(hIcon);
+
+            return icon;
+        }
+
+        enum Theme
+        {
+            Professional = 0,
+            Immersive = 1,
+            VisualStyles = 2,
+            Classic = 3,
+        }
+
+        Theme theme = Theme.Professional;
 
         public MainForm()
         {
@@ -34,20 +66,124 @@ namespace Monoxide.Dishes
             exePath = assembly.Location;
             title = Path.GetFileNameWithoutExtension(exePath);
             dir = Path.Combine(Path.GetDirectoryName(exePath), title);
+            appIcon = LoadIcon(-32512);
+            trayIconDark = LoadIcon(-40001);
+            trayIconLight = LoadIcon(-40002);
 
             InitializeComponent();
-            ni.Icon = this.Icon;
-            try {
-                ni.Icon = Icon.ExtractAssociatedIcon(exePath);
-            } catch { }
-            mainIcon = ni.Icon.ToBitmap();
+
+            RecreateRenderer();
+            RefreshTheme();
+
             ni.Text = title;
             ni.Visible = true;
+            Application.ApplicationExit += (s, e) =>
+            {
+                try { ni.Visible = false; } catch { }
+            };
+
             RebuildMenu();
 
-            menu.Renderer = new DirectionAwareToolStripProfessionalRenderer();
             ni.MouseMove += Ni_MouseMove;
             SetupMenuEvent();
+        }
+
+        ToolStripRenderer darkRenderer;
+        ToolStripRenderer lightRenderer;
+
+        private const int WM_DWMCOLORIZATIONCOLORCHANGED = 0x320;
+        private const int WM_DWMCOMPOSITIONCHANGED = 0x31E;
+        private const int WM_THEMECHANGED = 0x031A;
+
+        protected override void WndProc(ref Message m)
+        {
+            switch (m.Msg)
+            {
+                case WM_DWMCOLORIZATIONCOLORCHANGED:
+                case WM_DWMCOMPOSITIONCHANGED:
+                case WM_THEMECHANGED:
+                    RefreshTheme();
+                    break;
+            }
+            base.WndProc(ref m);
+        }
+
+        void RecreateRenderer()
+        {
+            if (theme == Theme.Immersive)
+            {
+                darkRenderer = new DirectionAwareToolStripRenderer.ToolStripProfessionalRenderer(new ImmersiveDarkColorTable());
+                lightRenderer = new DirectionAwareToolStripRenderer.ToolStripProfessionalRenderer(new ImmersiveLightColorTable());
+            }
+            else if (theme == Theme.Professional)
+            {
+                darkRenderer = new DirectionAwareToolStripRenderer.ToolStripProfessionalRenderer();
+                lightRenderer = darkRenderer;
+            }
+            else if (theme == Theme.VisualStyles)
+            {
+                darkRenderer = new DirectionAwareToolStripRenderer.NativeToolStripRenderer(UnFound.ToolbarTheme.Toolbar);
+                lightRenderer = darkRenderer;
+            }
+            else if (theme == Theme.Classic)
+            {
+                darkRenderer = new DirectionAwareToolStripRenderer.ToolStripSystemRenderer();
+                lightRenderer = darkRenderer; 
+            }
+        }
+
+        bool? currentTheme;
+        void RefreshTheme()
+        {
+            var newTheme = IsLightTheme();
+            if (!currentTheme.HasValue || currentTheme.Value != newTheme) {
+                currentTheme = newTheme;
+
+                ToolStripManager.Renderer = newTheme ? lightRenderer : darkRenderer;
+
+                Icon trayIcon = this.Icon;
+                if (appIcon != null) trayIcon = appIcon;
+                if (newTheme)
+                {
+                    if (trayIconLight != null) trayIcon = trayIconLight;
+                } else
+                {
+                    if (trayIconDark != null) trayIcon = trayIconDark;
+                }
+                ni.Icon = trayIcon;
+
+                Icon appMenuIcon = this.Icon;
+                if (appIcon != null) appMenuIcon = appIcon;
+                if (theme == Theme.Immersive)
+                {
+                    if (newTheme)
+                    {
+                        if (trayIconLight != null) appMenuIcon = trayIconLight;
+                    }
+                    else
+                    {
+                        if (trayIconDark != null) appMenuIcon = trayIconDark;
+                    }
+                }
+                appMenuBitmap = appMenuIcon != null ? appMenuIcon.ToBitmap() : null;
+                if (appMenu != null)
+                {
+                    appMenu.Image = appMenuBitmap;
+                }
+            }
+        }
+
+        bool IsLightTheme()
+        {
+            using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize", false))
+            {
+                if (key == null) return false;
+                var value = key.GetValue("SystemUsesLightTheme");
+                if (value is int theme) {
+                    return theme == 1;
+                }
+            }
+            return false;
         }
 
         private void Ni_MouseMove(object sender, MouseEventArgs e)
@@ -115,8 +251,15 @@ namespace Monoxide.Dishes
             public int Y;
         }
 
-        class DirectionAwareToolStripProfessionalRenderer : ToolStripProfessionalRenderer
+        class ImmersiveToolStripRenderer : ToolStripProfessionalRenderer
         {
+            public ImmersiveToolStripRenderer(bool light = false)
+            {
+                Light = light;
+            }
+
+            public bool Light = false;
+
             protected override void OnRenderArrow(ToolStripArrowRenderEventArgs e)
             {
                 if (e.Item is ToolStripDropDownItem ddi)
@@ -159,7 +302,8 @@ namespace Monoxide.Dishes
                         "<A HREF=\"https://redirect.orztech.com/dishes/thirdpartynotices\">Third Party Notices</A>"
                 },
                 SizeToContent = true,
-                EnableHyperlinks = true
+                EnableHyperlinks = true,
+                Icon = appIcon,
             };
             page.HyperlinkClicked += (s, e) =>
             {
@@ -208,6 +352,8 @@ namespace Monoxide.Dishes
             }
         }
 
+        ToolStripMenuItem appMenu;
+
         void RebuildMenu()
         {
             if (!Directory.Exists(dir)) { Directory.CreateDirectory(dir); }
@@ -215,13 +361,12 @@ namespace Monoxide.Dishes
             menu.Items.Clear();
             dropDownItems.Clear();
             var sub = new ToolStripMenuItem(title);
+            appMenu = sub;
             menu.Items.Add(sub);
             dropDownItems.Add(sub);
             ((ToolStripDropDownMenu)sub.DropDown).ShowImageMargin = false;
 
-            sub.Checked = true;
-            sub.CheckOnClick = false;
-            sub.Image = mainIcon;
+            sub.Image = appMenuBitmap;
             sub.DropDownItems.Add("&Refresh", null, (s, e) => RebuildMenu());
             sub.DropDownItems.Add("&Explorer...", null, (s, e) => Process.Start(new ProcessStartInfo()
             {
@@ -232,7 +377,9 @@ namespace Monoxide.Dishes
             sub.DropDownItems.Add("-");
             sub.DropDownItems.Add("&About" + (title == "Dishes" ? "" : " Dishes") + "...", null, (s, e) => ShowAboutBox());
             sub.DropDownItems.Add("-");
-            sub.DropDownItems.Add("&Exit", null, (s, e) => Application.Exit());
+            sub.DropDownItems.Add("&Exit", null, (s, e) => {
+                Application.Exit();
+            });
             menu.Items.Add("-");
             var regex = new Regex(@"^\d+\.");
             foreach (var i in Directory.EnumerateFiles(dir).OrderBy((i) => i))
@@ -244,7 +391,8 @@ namespace Monoxide.Dishes
                 if (name.StartsWith(".")) continue;
 
                 var match = regex.Match(name);
-                if (match != null) {
+                if (match != null)
+                {
                     name = name.Substring(match.Value.Length);
                 }
                 if (name == "-")
@@ -256,8 +404,10 @@ namespace Monoxide.Dishes
                 try
                 {
                     icon = Icon.ExtractAssociatedIcon(i).ToBitmap();
-                } catch { }
-                menu.Items.Add(name, icon, (s, e) => {
+                }
+                catch { }
+                menu.Items.Add(name, icon, (s, e) =>
+                {
                     Process.Start(new ProcessStartInfo()
                     {
                         FileName = i,

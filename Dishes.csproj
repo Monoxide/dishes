@@ -40,7 +40,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>TrayIcon.ico</ApplicationIcon>
+    <ApplicationIcon>MainIcon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -56,6 +56,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DirectionAwareToolStripRenderer.cs" />
+    <Compile Include="vendor\NativeToolStripRenderer\NativeToolStripRenderer.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -126,11 +128,17 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="MainIcon.ico" />
+    <Content Include="TrayIconLight.ico" />
     <Content Include="vendor\TaskDialog\LICENSE.txt" />
     <Content Include="ThirdPartyNotices.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TrayIcon.ico" />
+    <Content Include="TrayIconDark.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>$(ProjectDir)tools\InsertIcons.exe $(TargetPath) $(ProjectDir)TrayIconDark.ico;$(ProjectDir)TrayIconLight.ico
+</PostBuildEvent>
+  </PropertyGroup>
 </Project>
