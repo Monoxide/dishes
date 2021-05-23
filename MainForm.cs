@@ -116,18 +116,53 @@ namespace Monoxide.Dishes
         void LoadConfig()
         {
             var data = CreateDefaultConfig();
+
+            var text = "";
             if (File.Exists(configFilePath))
             {
                 try
                 {
-                    var userData = iniParser.ReadFile(configFilePath, Encoding.UTF8);
-                    data.Merge(userData);
+                    text = File.ReadAllText(configFilePath, Encoding.UTF8);
+                    using (var mem = new MemoryStream())
+                    {
+                        using (var writer = new StreamWriter(mem, Encoding.UTF8, 65536, true))
+                        {
+                            writer.Write(text);
+                            writer.Flush();
+                        }
+                        mem.Seek(0, SeekOrigin.Begin);
+                        using (var reader = new StreamReader(mem, Encoding.UTF8, false, 65536, true))
+                        {
+                            var userData = iniParser.ReadData(reader);
+                            data.Merge(userData);
+                        }
+                    }
                 }
                 catch { }
-            } else
-            {
-                iniParser.WriteFile(configFilePath, data, Encoding.UTF8);
             }
+
+            var dumped = "";
+            using (var mem = new MemoryStream()) {
+                using (var writer = new StreamWriter(mem, Encoding.UTF8, 65536, true))
+                {
+                    iniParser.WriteData(writer, data);
+                    writer.Flush();
+                }
+                mem.Seek(0, SeekOrigin.Begin);
+                using (var reader = new StreamReader(mem, Encoding.UTF8, false, 65536, true))
+                {
+                    dumped = reader.ReadToEnd();
+                }
+            }
+            if (text != dumped)
+            {
+                try
+                {
+                    File.WriteAllText(configFilePath, dumped);
+                }
+                catch { }
+            }
+
             iniData = data;
 
             if (!Enum.TryParse(iniData["Appearance"]["Theme"], out theme))

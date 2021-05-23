@@ -233,7 +233,11 @@ namespace IniParser.Model
             foreach (var keyData in keyDataToMerge)
             {
                 AddKey(keyData.KeyName);
-                GetKeyData(keyData.KeyName).Comments.AddRange(keyData.Comments);
+                if (keyData.Comments.Count > 0)
+                {
+                    GetKeyData(keyData.KeyName).Comments.Clear();
+                    GetKeyData(keyData.KeyName).Comments.AddRange(keyData.Comments);
+                }
                 this[keyData.KeyName] = keyData.Value;
             }
 
