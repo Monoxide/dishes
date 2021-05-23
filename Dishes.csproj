@@ -57,6 +57,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DirectionAwareToolStripRenderer.cs" />
+    <Compile Include="vendor\IniFileParser\Exceptions\ParsingException.cs" />
+    <Compile Include="vendor\IniFileParser\FileIniParser.cs" />
+    <Compile Include="vendor\IniFileParser\Helpers\Assert.cs" />
+    <Compile Include="vendor\IniFileParser\Model\Configuration\ConcatenateDuplicatedKeysIniParserConfiguration.cs" />
+    <Compile Include="vendor\IniFileParser\Model\Configuration\IniParserConfiguration.cs" />
+    <Compile Include="vendor\IniFileParser\Model\Formatting\DefaultIniDataFormatter.cs" />
+    <Compile Include="vendor\IniFileParser\Model\Formatting\IIniDataFormatter.cs" />
+    <Compile Include="vendor\IniFileParser\Model\IniData.cs" />
+    <Compile Include="vendor\IniFileParser\Model\IniDataCaseInsensitive.cs" />
+    <Compile Include="vendor\IniFileParser\Model\KeyData.cs" />
+    <Compile Include="vendor\IniFileParser\Model\KeyDataCollection.cs" />
+    <Compile Include="vendor\IniFileParser\Model\SectionData.cs" />
+    <Compile Include="vendor\IniFileParser\Model\SectionDataCollection.cs" />
+    <Compile Include="vendor\IniFileParser\Parser\ConcatenateDuplicatedKeysIniDataParser.cs" />
+    <Compile Include="vendor\IniFileParser\Parser\IniDataParser.cs" />
+    <Compile Include="vendor\IniFileParser\StreamIniDataParser.cs" />
+    <Compile Include="vendor\IniFileParser\StringIniParser.cs" />
     <Compile Include="vendor\NativeToolStripRenderer\NativeToolStripRenderer.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -123,6 +140,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="vendor\IniFileParser\LICENSE" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\App.config" />

@@ -25,6 +25,7 @@ namespace Monoxide.Dishes
         string title;
         string dir;
         string version;
+        string configFilePath;
 
         Icon appIcon;
         Icon trayIconDark;
@@ -66,6 +67,9 @@ namespace Monoxide.Dishes
             exePath = assembly.Location;
             title = Path.GetFileNameWithoutExtension(exePath);
             dir = Path.Combine(Path.GetDirectoryName(exePath), title);
+            configFilePath = dir + ".ini";
+            LoadConfig();
+
             appIcon = LoadIcon(-32512);
             trayIconDark = LoadIcon(-40001);
             trayIconLight = LoadIcon(-40002);
@@ -86,6 +90,50 @@ namespace Monoxide.Dishes
 
             ni.MouseMove += Ni_MouseMove;
             SetupMenuEvent();
+        }
+
+        IniParser.FileIniDataParser iniParser = new IniParser.FileIniDataParser();
+        IniParser.Model.IniData iniData;
+
+        IniParser.Model.IniData CreateDefaultConfig()
+        {
+            var iniData = new IniParser.Model.IniData();
+            iniData.Sections.AddSection("Appearance");
+            iniData.Sections["Appearance"].AddKey(new IniParser.Model.KeyData("Theme")
+            {
+                Value = "Professional",
+                Comments = new List<string>() {
+                    "Possible values:",
+                    "- Professional",
+                    "- Immersive",
+                    "- VisualStyles",
+                    "- Classic",
+                }
+            });
+            return iniData;
+        }
+
+        void LoadConfig()
+        {
+            var data = CreateDefaultConfig();
+            if (File.Exists(configFilePath))
+            {
+                try
+                {
+                    var userData = iniParser.ReadFile(configFilePath, Encoding.UTF8);
+                    data.Merge(userData);
+                }
+                catch { }
+            } else
+            {
+                iniParser.WriteFile(configFilePath, data, Encoding.UTF8);
+            }
+            iniData = data;
+
+            if (!Enum.TryParse(iniData["Appearance"]["Theme"], out theme))
+            {
+                theme = Theme.Professional;
+            };
         }
 
         ToolStripRenderer darkRenderer;
@@ -133,10 +181,10 @@ namespace Monoxide.Dishes
         }
 
         bool? currentTheme;
-        void RefreshTheme()
+        void RefreshTheme(bool force = false)
         {
             var newTheme = IsLightTheme();
-            if (!currentTheme.HasValue || currentTheme.Value != newTheme) {
+            if (!currentTheme.HasValue || currentTheme.Value != newTheme || force) {
                 currentTheme = newTheme;
 
                 ToolStripManager.Renderer = newTheme ? lightRenderer : darkRenderer;
@@ -179,7 +227,7 @@ namespace Monoxide.Dishes
             {
                 if (key == null) return false;
                 var value = key.GetValue("SystemUsesLightTheme");
-                if (value is int theme) {
+                if (value != null && value is int theme) {
                     return theme == 1;
                 }
             }
@@ -354,6 +402,14 @@ namespace Monoxide.Dishes
 
         ToolStripMenuItem appMenu;
 
+        void Refresh()
+        {
+            LoadConfig();
+            RecreateRenderer();
+            RefreshTheme(true);
+            RebuildMenu();
+        }
+
         void RebuildMenu()
         {
             if (!Directory.Exists(dir)) { Directory.CreateDirectory(dir); }
@@ -367,7 +423,9 @@ namespace Monoxide.Dishes
             ((ToolStripDropDownMenu)sub.DropDown).ShowImageMargin = false;
 
             sub.Image = appMenuBitmap;
-            sub.DropDownItems.Add("&Refresh", null, (s, e) => RebuildMenu());
+            sub.DropDownItems.Add("&Refresh", null, (s, e) => {
+                Refresh();
+            });
             sub.DropDownItems.Add("&Explorer...", null, (s, e) => Process.Start(new ProcessStartInfo()
             {
                 FileName = "explorer.exe",
