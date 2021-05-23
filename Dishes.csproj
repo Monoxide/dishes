@@ -40,7 +40,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>MainIcon.ico</ApplicationIcon>
+    <ApplicationIcon>icons\MainIcon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -128,17 +128,17 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="MainIcon.ico" />
-    <Content Include="TrayIconLight.ico" />
+    <Content Include="icons\MainIcon.ico" />
+    <Content Include="icons\TrayIconLight.ico" />
     <Content Include="vendor\TaskDialog\LICENSE.txt" />
     <Content Include="ThirdPartyNotices.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TrayIconDark.ico" />
+    <Content Include="icons\TrayIconDark.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>$(ProjectDir)tools\InsertIcons.exe $(TargetPath) $(ProjectDir)TrayIconDark.ico;$(ProjectDir)TrayIconLight.ico
+    <PostBuildEvent>$(ProjectDir)tools\InsertIcons.exe $(TargetPath) $(ProjectDir)icons\TrayIconDark.ico;$(ProjectDir)icons\TrayIconLight.ico
 </PostBuildEvent>
   </PropertyGroup>
 </Project>
